@@ -1,4 +1,4 @@
-class todoItem {
+export class TodoItem {
     title: string;
     description: string;
     dueDate: string;
