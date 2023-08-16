@@ -9,8 +9,8 @@ export class Project {
         this.todos = [];
     }
 
-    addTodo(todo: TodoItem) {
-        this.todos.push(todo);
+    addTodo(title: string, description: string, dueDate: string, priority: string, notes: string) {
+        this.todos.push(new TodoItem(title, description, dueDate, priority, notes));
     }
 
     removeTodo(todo: TodoItem) {
