@@ -21,23 +21,23 @@ export class TodoController {
     }
 
     changeTodoTitle(projectIndex: number, todoIndex: number, title: string) {
-        this.projects[projectIndex].todos[todoIndex].title = title;
+        this.projects[projectIndex].changeTodoTitle(todoIndex, title);
     }
 
     changeTodoDescription(projectIndex: number, todoIndex: number, description: string) {
-        this.projects[projectIndex].todos[todoIndex].description = description;
+        this.projects[projectIndex].changeTodoDescription(todoIndex, description);
     }
 
-    changeTodoNote(projectIndex: number, todoIndex: number, note: string) {
-        this.projects[projectIndex].todos[todoIndex].notes = note;
+    changeTodoNote(projectIndex: number, todoIndex: number, notes: string) {
+        this.projects[projectIndex].changeTodoNote(todoIndex, notes);
     }
 
     changeDate(projectIndex: number, todoIndex: number, dueDate: string) {
-        this.projects[projectIndex].todos[todoIndex].dueDate = dueDate;
+        this.projects[projectIndex].changeDate(todoIndex, dueDate);
     }
 
     changePriority(projectIndex: number, todoIndex: number, priority: string) {
-        this.projects[projectIndex].todos[todoIndex].priority = priority;
+        this.projects[projectIndex].changePriority(todoIndex, priority);
     }
 
     removeProject(index: number) { this.projects.splice(index, 1) }
