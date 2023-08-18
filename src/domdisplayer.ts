@@ -1,6 +1,7 @@
 import barsImage from './icons/bars-solid.svg';
 import magnifyingGlassImage from './icons/search-solid.svg';
 import dropDownImage from './icons/chevron-circle-down-solid.svg';
+import './style.css';
 
 export class DOMDisplayer {
     
