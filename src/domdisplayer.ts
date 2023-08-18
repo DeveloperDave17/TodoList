@@ -5,12 +5,12 @@ import dropDownImage from './icons/chevron-circle-down-solid.svg';
 export class DOMDisplayer {
     
     displayLayout() {
-        const body = document.querySelector('body');
         const mainContainer = document.createElement('div');
         mainContainer.setAttribute('id', 'main-container');
-        body.appendChild(mainContainer);
+        document.body.appendChild(mainContainer);
         this.displayNavbar();
         this.displaySidePanel();
+        this.displayProjectTitle('Today');
         this.displayProjectContainer('Today');
         this.displayCreateTodo();
     }
