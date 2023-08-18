@@ -43,13 +43,16 @@ export class DOMDisplayer {
         const sidePanelContainer = document.createElement('div');
         sidePanelContainer.setAttribute('id', 'side-panel-container');
 
+        const projectsContainerTitle = document.createElement('h2');
+        projectsContainerTitle.textContent = 'Projects';
+
         const projectsContainer = document.createElement('div');
         projectsContainer.setAttribute('id', 'projects-container');
 
         const createProjectButton = document.createElement('button');
         createProjectButton.textContent = 'Create Project';
 
-        sidePanelContainer.append(projectsContainer, createProjectButton);
+        sidePanelContainer.append(projectsContainerTitle, projectsContainer, createProjectButton);
         mainContainer.appendChild(sidePanelContainer);
     }
 
