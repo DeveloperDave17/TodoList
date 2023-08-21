@@ -64,7 +64,6 @@ export class DOMDisplayer {
     }
 
     displayTodo(title: string, dueDate: string, priority: string) {
-        const projectTodoContainer = document.getElementById('project-todos-container');
         const todoContainer = document.createElement('div');
         todoContainer.classList.add('todo-container');
 
@@ -79,7 +78,10 @@ export class DOMDisplayer {
 
         todoContainer.append(titleElement, dueDateElement, dropDownElement);
         this.displayPriority(todoContainer, priority);
-        projectTodoContainer.appendChild(todoContainer);
+
+        const projectTodoContainer = document.getElementById('project-todos-container');
+        const createTodoContainer = document.getElementById('create-todo-container');
+        projectTodoContainer.insertBefore(todoContainer, createTodoContainer);
     }
 
     displayPriority(todoContainer: HTMLDivElement, priority: string) {
@@ -133,5 +135,106 @@ export class DOMDisplayer {
         createTodoContainer.appendChild(createTodoText);
         projectTodoContainer.appendChild(createTodoContainer);
     }
+
+    displayExpandedTodo(todoIndex: number, title: string, description: string, notes: string, priority: string, dueDate: string) {
+        const todoContainer = document.createElement('div');
+        todoContainer.classList.add('todo-container');
+
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = title;
+        titleElement.setAttribute('contenteditable', 'true');
+
+        const descriptionElement = document.createElement('input');
+        descriptionElement.type = 'text';
+        descriptionElement.value = description;
+
+        const notesHeader = document.createElement('h3');
+        notesHeader.textContent = 'Notes';
+
+        const notesElement = document.createElement('input');
+        notesElement.type = 'text';
+        notesElement.value = notes;
+
+        const priorityContainer = document.createElement('div');
+
+        const priorityLabel = document.createElement('label');
+        priorityLabel.textContent = 'Priority:';
+        priorityLabel.setAttribute('for', 'priority');
+        const prioritySelection = document.createElement('select');
+        prioritySelection.setAttribute('name', 'priority');
+        prioritySelection.setAttribute('id', 'priority');
+
+        const lowPriorityOption = document.createElement('option');
+        lowPriorityOption.setAttribute('value', 'low');
+        lowPriorityOption.textContent = 'low';
+        if (priority === 'low') { lowPriorityOption.selected = true; }
+
+        const medPriorityOption = document.createElement('option');
+        medPriorityOption.setAttribute('value', 'medium');
+        medPriorityOption.textContent = 'medium';
+        if (priority === 'medium') { medPriorityOption.selected = true; }
+
+        const highPriorityOption = document.createElement('option');
+        highPriorityOption.setAttribute('value', 'high');
+        highPriorityOption.textContent = 'high';
+        if (priority === 'high') { highPriorityOption.selected = true; }
+
+        const noPriorityOption = document.createElement('option');
+        noPriorityOption.setAttribute('value', 'none');
+        noPriorityOption.textContent = 'none';
+        if (priority === 'none') { noPriorityOption.selected = true; }
+
+        prioritySelection.append(noPriorityOption, lowPriorityOption, medPriorityOption, highPriorityOption);
+        priorityContainer.append(priorityLabel, prioritySelection);
+
+        const dueDateElement = document.createElement('input');
+        dueDateElement.type = 'date';
+        dueDateElement.value = dueDate;
+
+        const dropDownElement = new Image();
+        dropDownElement.src = dropDownImage;
+
+        todoContainer.append(titleElement, descriptionElement, notesElement, dueDateElement, priorityContainer, dropDownElement);
+        this.displayPriority(todoContainer, priority);
+
+        const projectTodoContainer = document.getElementById('project-todos-container');
+        const projectTodos = document.querySelectorAll('todo-container');
+        projectTodoContainer.insertBefore(todoContainer, projectTodos[todoIndex]);
+        projectTodoContainer.removeChild(projectTodos[todoIndex + 1]);
+    }
+
+    addEventListenersToExpandedTodo(todoIndex: number, updateStoredTitle: (title: string) => void, updateStoredDesc: (description: string) => void, updateStoredNotes: (notes: string) => void, updateStoredPriority: (priority: string) => void, updateStoredDueDate: (dueDate: string) => void) {
+        const projectTodos = document.querySelectorAll('todo-container');
+        const todoContainer = projectTodos[todoIndex];
+
+        const titleElement = todoContainer.querySelector('h2');
+        titleElement.addEventListener('input', () => { updateStoredTitle(titleElement.textContent) });
+
+        const inputElements = todoContainer.querySelectorAll('input');
+        const descriptionElement = inputElements[0];
+        descriptionElement.addEventListener('input', () => { updateStoredDesc(descriptionElement.value) });
+
+        const notesElement = inputElements[1];
+        notesElement.addEventListener('input', () => { updateStoredNotes(notesElement.value) });
+
+        const dueDateElement = inputElements[2];
+        dueDateElement.addEventListener('input', () => { updateStoredDueDate(dueDateElement.value) });
+
+        const priorityElement = todoContainer.querySelector('select');
+        priorityElement.addEventListener('change', () => { updateStoredPriority(priorityElement.value) });
+    }
+
+    addEventListenerToCreateTodo(createStoredTodo: (title: string, description: string, notes: string, dueDate: string, priority: string) => void) {
+        const createTodoElement = document.getElementById('create-todo-container');
+        createTodoElement.addEventListener('click', () => {
+            let title = 'default';
+            let dueDate = '11/11/2011';
+            let priority = 'none';
+            createStoredTodo(title, '...', '...', dueDate, priority);
+            this.displayTodo(title, dueDate, priority);
+        });
+    }
+
+    
 
 }
