@@ -18,7 +18,7 @@ body {
     grid-template-columns: 200px 1fr;
     grid-template-rows: 50px 1fr;
     width: 100vw;
-    min-height: 100vh;
+    height: 100vh;
 }
 
 #nav-bar-container {
@@ -66,15 +66,48 @@ body {
 
 #project-todos-container {
     display: flex;
-    flex-grow: 0;
+    flex-grow: 1;
     gap: 50px;
     flex-wrap: wrap;
+    max-width: calc(100vw - 200px);
 }
 
 .todo-container, #create-todo-container {
     height: 300px;
     width: 300px;
-    background-color: var(--secondary-color-with-opac);
+    background-color: var(--secondary-color);
+}
+
+.todo-container>img {
+    height: 32px;
+    width: auto;
+    filter: var(--primary-svg);
+    align-self: last baseline;
+    justify-self: end;
+    margin: 0px 10px 10px 0px;
+}
+
+.todo-container {
+    display: grid;
+    grid-template-rows: 4fr 1fr 1fr;
+    max-width: 300px;
+    max-height: 300px;
+    text-align: center;
+}
+
+.todo-container>h2:first-child {
+    align-self: center;
+    justify-self: center;
+    font-size: 24px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+}
+
+.todo-container>p {
+    align-self: baseline;
+    justify-self: center;
+    font-size: 24px;
 }
 
 #create-todo-container {
