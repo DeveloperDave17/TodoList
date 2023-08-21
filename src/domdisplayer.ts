@@ -84,6 +84,12 @@ export class DOMDisplayer {
         projectTodoContainer.insertBefore(todoContainer, createTodoContainer);
     }
 
+    addEventListenerToTodo(index: number, expandTodo: () => void) {
+        const projectTodos = document.querySelectorAll('.todo-container');
+        const todoContainer = projectTodos[index];
+        todoContainer.addEventListener('click', expandTodo);
+    }
+
     displayPriority(todoContainer: HTMLDivElement, priority: string) {
         let backgroundcolor = 'black';
         if (priority === 'low') {
@@ -198,13 +204,13 @@ export class DOMDisplayer {
         this.displayPriority(todoContainer, priority);
 
         const projectTodoContainer = document.getElementById('project-todos-container');
-        const projectTodos = document.querySelectorAll('todo-container');
+        const projectTodos = document.querySelectorAll('.todo-container');
         projectTodoContainer.insertBefore(todoContainer, projectTodos[todoIndex]);
-        projectTodoContainer.removeChild(projectTodos[todoIndex + 1]);
+        projectTodoContainer.removeChild(projectTodos[todoIndex]);
     }
 
     addEventListenersToExpandedTodo(todoIndex: number, updateStoredTitle: (title: string) => void, updateStoredDesc: (description: string) => void, updateStoredNotes: (notes: string) => void, updateStoredPriority: (priority: string) => void, updateStoredDueDate: (dueDate: string) => void) {
-        const projectTodos = document.querySelectorAll('todo-container');
+        const projectTodos = document.querySelectorAll('.todo-container');
         const todoContainer = projectTodos[todoIndex];
 
         const titleElement = todoContainer.querySelector('h2');
@@ -224,14 +230,10 @@ export class DOMDisplayer {
         priorityElement.addEventListener('change', () => { updateStoredPriority(priorityElement.value) });
     }
 
-    addEventListenerToCreateTodo(createStoredTodo: (title: string, description: string, notes: string, dueDate: string, priority: string) => void) {
+    addEventListenerToCreateTodo(createTodo: () => void) {
         const createTodoElement = document.getElementById('create-todo-container');
         createTodoElement.addEventListener('click', () => {
-            let title = 'default';
-            let dueDate = '11/11/2011';
-            let priority = 'none';
-            createStoredTodo(title, '...', '...', dueDate, priority);
-            this.displayTodo(title, dueDate, priority);
+            createTodo();
         });
     }
 

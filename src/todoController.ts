@@ -49,11 +49,29 @@ export class TodoController {
         this.projects[projectIndex].todos.splice(todoIndex, 1);
     }
 
+    createTodo(projectIndex: number) {
+        let defaultTodoTitle: string = "Title";
+        let defaultTodoDescription: string = "description";
+        let defaultDate: string = "01/01/0000";
+        let defaultPriority: string = "none";
+        let defaultNotes: string = "...";
+        this.projects[projectIndex].addTodo(defaultTodoTitle, defaultTodoDescription, defaultDate, defaultPriority, defaultNotes);
+        let todoIndex = this.projects[projectIndex].todos.length - 1;
+        this.domDisplayer.displayTodo(defaultTodoTitle, defaultDate, defaultPriority);
+        this.domDisplayer.addEventListenerToTodo(todoIndex, () => this.expandTodo(projectIndex, todoIndex))
+    }
+
+    expandTodo(projectIndex: number, todoIndex: number) {
+        const project = this.projects[projectIndex];
+        const todo = project.todos[todoIndex];
+        this.domDisplayer.displayExpandedTodo(todoIndex, todo.title, todo.description, todo.notes, todo.priority, todo.dueDate);
+    }
+
     loadDefaultPage() {
         this.addProject('Today');
         this.domDisplayer.displayLayout();
-        this.domDisplayer.addEventListenerToCreateTodo((title: string, description: string, notes: string, dueDate: string, priority: string) => {
-            this.projects[0].addTodo(title, description, dueDate, priority, notes);
+        this.domDisplayer.addEventListenerToCreateTodo(() => {
+            this.createTodo(0);
         });
     }
 }
