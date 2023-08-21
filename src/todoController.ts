@@ -1,7 +1,10 @@
 import { Project } from "./project";
+import { DOMDisplayer } from "./domdisplayer";
+import { TodoItem } from "./todoItem";
 
 export class TodoController {
     projects: Array<Project>;
+    domDisplayer: DOMDisplayer = new DOMDisplayer();
 
     constructor() { this.projects = [] }
 
@@ -44,5 +47,13 @@ export class TodoController {
 
     removeTodo(projectIndex: number, todoIndex: number) { 
         this.projects[projectIndex].todos.splice(todoIndex, 1);
+    }
+
+    loadDefaultPage() {
+        this.addProject('Today');
+        this.domDisplayer.displayLayout();
+        this.domDisplayer.addEventListenerToCreateTodo((title: string, description: string, notes: string, dueDate: string, priority: string) => {
+            this.projects[0].addTodo(title, description, dueDate, priority, notes);
+        });
     }
 }
