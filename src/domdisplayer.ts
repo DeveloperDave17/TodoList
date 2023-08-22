@@ -63,7 +63,7 @@ export class DOMDisplayer {
         projectsContainer.appendChild(projectTitleElement);
     }
 
-    displayTodo(title: string, dueDate: string, priority: string) {
+    displayTodo(elementAfter: Element, title: string, dueDate: string, priority: string) {
         const todoContainer = document.createElement('div');
         todoContainer.classList.add('todo-container');
 
@@ -80,8 +80,35 @@ export class DOMDisplayer {
         this.displayPriority(todoContainer, priority);
 
         const projectTodoContainer = document.getElementById('project-todos-container');
-        const createTodoContainer = document.getElementById('create-todo-container');
-        projectTodoContainer.insertBefore(todoContainer, createTodoContainer);
+        projectTodoContainer.insertBefore(todoContainer, elementAfter);
+    }
+
+    displayTodoAtIndex(todoIndex: number, title: string, dueDate: string, priority: string) {
+        const projectTodos = document.querySelectorAll('.todo-container');
+        const todoElement = projectTodos[todoIndex];
+        if (todoElement === null) {
+            const createElement = document.getElementById('create-todo-container');
+            this.displayTodo(createElement, title, dueDate, priority);
+        } else {
+            this.displayTodo(todoElement, title, dueDate, priority);
+        }
+    }
+
+    displayTodoBeforeCreateDiv(title: string, dueDate: string, priority: string) {
+        const createElement = document.getElementById('create-todo-container');
+        this.displayTodo(createElement, title, dueDate, priority);
+    }
+
+    removeTodoElement(todoElement: Element) {
+        document.getElementById('project-todos-container').removeChild(todoElement);
+    }
+
+    removeTodoAtIndex(todoIndex: number) {
+        const projectTodos = document.querySelectorAll('.todo-container');
+        const todoElement = projectTodos[todoIndex];
+        if (todoElement !== null) {
+            this.removeTodoElement(todoElement);
+        }
     }
 
     addEventListenerToTodo(index: number, expandTodo: () => void) {
@@ -209,7 +236,7 @@ export class DOMDisplayer {
         projectTodoContainer.removeChild(projectTodos[todoIndex]);
     }
 
-    addEventListenersToExpandedTodo(todoIndex: number, updateStoredTitle: (title: string) => void, updateStoredDesc: (description: string) => void, updateStoredNotes: (notes: string) => void, updateStoredPriority: (priority: string) => void, updateStoredDueDate: (dueDate: string) => void) {
+    addEventListenersToExpandedTodo(todoIndex: number, updateStoredTitle: (title: string) => void, updateStoredDesc: (description: string) => void, updateStoredNotes: (notes: string) => void, updateStoredPriority: (priority: string) => void, updateStoredDueDate: (dueDate: string) => void, collapseTodo: () => void) {
         const projectTodos = document.querySelectorAll('.todo-container');
         const todoContainer = projectTodos[todoIndex];
 
@@ -228,6 +255,9 @@ export class DOMDisplayer {
 
         const priorityElement = todoContainer.querySelector('select');
         priorityElement.addEventListener('change', () => { updateStoredPriority(priorityElement.value) });
+
+        const collapseElement = todoContainer.querySelector('img');
+        collapseElement.addEventListener('click', collapseTodo);
     }
 
     addEventListenerToCreateTodo(createTodo: () => void) {

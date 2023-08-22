@@ -57,14 +57,30 @@ export class TodoController {
         let defaultNotes: string = "...";
         this.projects[projectIndex].addTodo(defaultTodoTitle, defaultTodoDescription, defaultDate, defaultPriority, defaultNotes);
         let todoIndex = this.projects[projectIndex].todos.length - 1;
-        this.domDisplayer.displayTodo(defaultTodoTitle, defaultDate, defaultPriority);
-        this.domDisplayer.addEventListenerToTodo(todoIndex, () => this.expandTodo(projectIndex, todoIndex))
+        this.domDisplayer.displayTodoBeforeCreateDiv(defaultTodoTitle, defaultDate, defaultPriority);
+        this.domDisplayer.addEventListenerToTodo(todoIndex, () => this.expandTodo(projectIndex, todoIndex));
     }
 
     expandTodo(projectIndex: number, todoIndex: number) {
         const project = this.projects[projectIndex];
         const todo = project.todos[todoIndex];
         this.domDisplayer.displayExpandedTodo(todoIndex, todo.title, todo.description, todo.notes, todo.priority, todo.dueDate);
+        this.domDisplayer.addEventListenersToExpandedTodo(todoIndex, 
+            (title: string) => {this.changeTodoTitle(projectIndex, todoIndex, title)},
+            (description: string) => {this.changeTodoDescription(projectIndex, todoIndex, description)},
+            (notes: string) => {this.changeTodoNote(projectIndex, todoIndex, notes)},
+            (priority: string) => {this.changePriority(projectIndex, todoIndex, priority)},
+            (date: string) => {this.changeDate(projectIndex, todoIndex, date)},
+            () => {this.collapseTodo(projectIndex, todoIndex)});
+    }
+
+    collapseTodo(projectIndex: number, todoIndex: number) {
+        const project = this.projects[projectIndex];
+        const todo = project.todos[todoIndex];
+        this.domDisplayer.displayTodoAtIndex(todoIndex, todo.title, todo.dueDate, todo.priority);
+        this.domDisplayer.addEventListenerToTodo(todoIndex, () => this.expandTodo(projectIndex, todoIndex));
+        // removes the expanded todo
+        this.domDisplayer.removeTodoAtIndex(todoIndex + 1);
     }
 
     loadDefaultPage() {
