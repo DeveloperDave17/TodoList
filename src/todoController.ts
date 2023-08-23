@@ -47,6 +47,19 @@ export class TodoController {
 
     removeTodo(projectIndex: number, todoIndex: number) { 
         this.projects[projectIndex].todos.splice(todoIndex, 1);
+        this.domDisplayer.removeTodoAtIndex(todoIndex);
+        for (let i = todoIndex; i < this.projects[projectIndex].todos.length; i++) {
+            this.domDisplayer.cloneTodo(i);
+            this.domDisplayer.addEventListenersToClonedTodo(i,
+                () => {this.expandTodo(projectIndex, i)},
+                (title: string) => {this.changeTodoTitle(projectIndex, i, title)},
+                (description: string) => {this.changeTodoDescription(projectIndex, i, description)},
+                (notes: string) => {this.changeTodoNote(projectIndex, i, notes)},
+                (priority: string) => {this.changePriority(projectIndex, i, priority)},
+                (date: string) => {this.changeDate(projectIndex, i, date)},
+                () => {this.removeTodo(projectIndex, i)},
+                () => {this.collapseTodo(projectIndex, i)});
+        }
     }
 
     createTodo(projectIndex: number) {
@@ -71,6 +84,7 @@ export class TodoController {
             (notes: string) => {this.changeTodoNote(projectIndex, todoIndex, notes)},
             (priority: string) => {this.changePriority(projectIndex, todoIndex, priority)},
             (date: string) => {this.changeDate(projectIndex, todoIndex, date)},
+            () => {this.removeTodo(projectIndex, todoIndex)},
             () => {this.collapseTodo(projectIndex, todoIndex)});
     }
 
