@@ -110,7 +110,7 @@ export class DOMDisplayer {
         selectedProject.textContent = projectTitle;
     }
 
-    displayTodo(elementAfter: Element, todo: TodoItem, removeTodo: () => void) {
+    displayTodo(elementAfter: Element, todo: TodoItem, removeTodo: () => void, toggleCompleteTodo: () => void) {
         const todoContainer = document.createElement('div');
         todoContainer.classList.add('todo-container');
         todoContainer.classList.add('collapsed');
@@ -128,19 +128,43 @@ export class DOMDisplayer {
         this.displayPriority(todoContainer, todo.priority);
 
         const projectTodoContainer = document.getElementById('project-todos-container');
-        projectTodoContainer.insertBefore(todoContainer, elementAfter);
+        if (projectTodoContainer.contains(elementAfter)) {
+            projectTodoContainer.insertBefore(todoContainer, elementAfter);
+        } else {
+            const completeTodosContainer = document.getElementById('completed-todos-container');
+            completeTodosContainer.insertBefore(todoContainer, elementAfter);
+        }
         todoContainer.addEventListener('click', () => {
-            this.displayExpandedTodo(todo, todoContainer, removeTodo);
+            this.displayExpandedTodo(todo, todoContainer, removeTodo, toggleCompleteTodo);
         })
     }
 
-    displayTodoBeforeCreateDiv(todo: TodoItem, removeTodo: () => void) {
+    displayTodoBeforeCreateDiv(todo: TodoItem, removeTodo: () => void, toggleCompleteTodo: () => void) {
         const createElement = document.getElementById('create-todo-container');
-        this.displayTodo(createElement, todo, removeTodo);
+        this.displayTodo(createElement, todo, removeTodo, toggleCompleteTodo);
+    }
+
+    toggleDisplayCompletedTodo(todoContainer: Element) {
+        const projectTodosContainer = document.getElementById('project-todos-container');
+        const completedTodosContainer = document.getElementById('completed-todos-container');
+        if (projectTodosContainer.contains(todoContainer)) {
+            projectTodosContainer.removeChild(todoContainer);
+            completedTodosContainer.appendChild(todoContainer);
+        } else {
+            completedTodosContainer.removeChild(todoContainer);
+            const createTodoContainer = document.getElementById('create-todo-container');
+            projectTodosContainer.insertBefore(todoContainer, createTodoContainer);
+        }
     }
 
     removeTodoElement(todoElement: Element) {
-        document.getElementById('project-todos-container').removeChild(todoElement);
+        const projectTodoContainer = document.getElementById('project-todos-container');
+        if (projectTodoContainer.contains(todoElement)) {
+            projectTodoContainer.removeChild(todoElement)
+        } else {
+            const completeTodosContainer = document.getElementById('completed-todos-container');
+            completeTodosContainer.removeChild(todoElement);
+        }
     }
 
     removeTodoAtIndex(todoIndex: number) {
@@ -179,7 +203,13 @@ export class DOMDisplayer {
         const projectTodosContainer = document.createElement('div');
         projectTodosContainer.setAttribute('id', 'project-todos-container');
 
-        projectContainer.append(projectTitleElement, projectTodosContainer);
+        const completedTitleElement = document.createElement('h1');
+        completedTitleElement.textContent = 'Completed';
+
+        const completedTodosContainer = document.createElement('div');
+        completedTodosContainer.setAttribute('id', 'completed-todos-container');
+
+        projectContainer.append(projectTitleElement, projectTodosContainer, completedTitleElement, completedTodosContainer);
         mainContainer.append(projectContainer);
     }
 
@@ -216,13 +246,25 @@ export class DOMDisplayer {
         projectTodoContainer.appendChild(createTodoContainer);
     }
 
-    displayExpandedTodo(todo: TodoItem, todoElement: HTMLDivElement, removeTodo: () => void) {
+    displayExpandedTodo(todo: TodoItem, todoElement: HTMLDivElement, removeTodo: () => void, toggleCompleteTodo: () => void) {
         const todoContainer = document.createElement('div');
         todoContainer.classList.add('todo-container');
         todoContainer.classList.add('expanded');
 
+        const todoTop = document.createElement('div');
+        todoTop.classList.add('todo-top');
+
+        const completeTodoBox = document.createElement('input');
+        completeTodoBox.setAttribute('type', 'checkbox');
+        completeTodoBox.addEventListener('change', () => {
+            toggleCompleteTodo();
+            this.toggleDisplayCompletedTodo(todoContainer);
+        });
+
         const trashCanElement = new Image();
         trashCanElement.src = trashCanImage;
+
+        todoTop.append(completeTodoBox, trashCanElement);
 
         const titleElement = document.createElement('h2');
         titleElement.textContent = todo.title;
@@ -278,16 +320,22 @@ export class DOMDisplayer {
         const dropDownElement = new Image();
         dropDownElement.src = dropDownImage;
 
-        todoContainer.append(trashCanElement, titleElement, descriptionElement, notesHeader, notesElement, dueDateElement, priorityContainer, dropDownElement);
+        todoContainer.append(todoTop, titleElement, descriptionElement, notesHeader, notesElement, dueDateElement, priorityContainer, dropDownElement);
         this.displayPriority(todoContainer, todo.priority);
 
         const projectTodoContainer = document.getElementById('project-todos-container');
-        projectTodoContainer.insertBefore(todoContainer, todoElement);
-        projectTodoContainer.removeChild(todoElement);
-        this.addEventListenersToExpandedTodo(todo, todoContainer, removeTodo);
+        if (projectTodoContainer.contains(todoElement)) {
+            projectTodoContainer.insertBefore(todoContainer, todoElement);
+            projectTodoContainer.removeChild(todoElement);
+        } else {
+            const completeTodosContainer = document.getElementById('completed-todos-container');
+            completeTodosContainer.insertBefore(todoContainer, todoElement);
+            completeTodosContainer.removeChild(todoElement);
+        }
+        this.addEventListenersToExpandedTodo(todo, todoContainer, removeTodo, toggleCompleteTodo);
     }
 
-    addEventListenersToExpandedTodo(todo: TodoItem, todoContainer: Element, removeTodo: () => void) {
+    addEventListenersToExpandedTodo(todo: TodoItem, todoContainer: Element, removeTodo: () => void, toggleCompleteTodo: () => void) {
         const titleElement = todoContainer.querySelector('h2');
         titleElement.addEventListener('input', () => { todo.title = titleElement.textContent });
 
@@ -312,7 +360,7 @@ export class DOMDisplayer {
 
         const collapseElement = images[1];
         collapseElement.addEventListener('click', () => { 
-            this.displayTodo(todoContainer, todo, removeTodo);
+            this.displayTodo(todoContainer, todo, removeTodo, toggleCompleteTodo);
             this.removeTodoElement(todoContainer);
         });
     }

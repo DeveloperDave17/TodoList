@@ -3,10 +3,12 @@ import { TodoItem } from "./todoItem";
 export class Project {
     title: string;
     todos: Array<TodoItem>;
+    completedTodos: Array<TodoItem>;
 
     constructor(title: string) {
         this.title = title;
         this.todos = [];
+        this.completedTodos = [];
     }
 
     addTodo(title: string, description: string, dueDate: string, priority: string, notes: string) {
@@ -33,8 +35,25 @@ export class Project {
         this.todos[todoIndex].priority = priority;
     }
 
-    removeTodo(todo: TodoItem) {
-        let todoIndex: number = this.todos.findIndex((element) => { element === todo});
-        this.todos.splice(todoIndex, 1);
+    removeTodo(targetTodo: TodoItem) {
+        if (this.todos.includes(targetTodo)) {
+            this.todos = this.todos.filter((todo) => todo !== targetTodo);
+        } else {
+            this.removeCompletedTodo(targetTodo);
+        }
+    }
+
+    removeCompletedTodo(targetTodo: TodoItem) {
+        this.completedTodos = this.completedTodos.filter((todo) => todo !== targetTodo);
+    }
+
+    toggleCompleteTodo(todo: TodoItem) {
+        if (this.todos.includes(todo)) {
+            this.removeTodo(todo);
+            this.completedTodos.push(todo);
+        } else {
+            this.removeTodo(todo);  
+            this.todos.push(todo);
+        }
     }
 }

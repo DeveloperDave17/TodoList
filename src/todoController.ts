@@ -9,12 +9,12 @@ export class TodoController {
     constructor() { this.projects = []; }
 
     removeProject(projectToRemove: Project) { 
-        this.projects.filter((project) => project !== projectToRemove);
+        this.projects = this.projects.filter((project) => project !== projectToRemove);
     }
 
-    removeTodo(project: Project, todoToRemove: TodoItem) {
-        project.todos.filter((todo) => todo !== todoToRemove);
-    }
+    // removeTodo(project: Project, todoToRemove: TodoItem) {
+    //     project.todos.filter((todo) => todo !== todoToRemove);
+    // }
 
     createTodo(project: Project) {
         let defaultTodoTitle: string = "Title";
@@ -24,7 +24,7 @@ export class TodoController {
         let defaultNotes: string = "...";
         let todo = new TodoItem(defaultTodoTitle, defaultTodoDescription, defaultDate, defaultPriority, defaultNotes);
         project.todos.push(todo);
-        this.domDisplayer.displayTodoBeforeCreateDiv(todo, () => { this.removeTodo(project, todo)});
+        this.domDisplayer.displayTodoBeforeCreateDiv(todo, () => { project.removeTodo(todo)}, () => { project.toggleCompleteTodo(todo) });
     }
 
     loadDefaultPage() {
@@ -39,7 +39,7 @@ export class TodoController {
 
     loadTodos(project: Project) {
         for (let todo of project.todos) {
-            this.domDisplayer.displayTodoBeforeCreateDiv(todo, () => { this.removeTodo(project, todo)});
+            this.domDisplayer.displayTodoBeforeCreateDiv(todo, () => { project.removeTodo(todo)}, () => { project.toggleCompleteTodo(todo) });
         }
     }
 

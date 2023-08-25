@@ -64,7 +64,7 @@ body {
     color: var(--primary-text);
 }
 
-#project-todos-container {
+#project-todos-container, #completed-todos-container {
     display: flex;
     flex-grow: 1;
     gap: 50px;
@@ -78,7 +78,7 @@ body {
     background-color: var(--secondary-color);
 }
 
-.todo-container>img {
+.todo-container img {
     height: 32px;
     width: auto;
     filter: var(--primary-svg);
