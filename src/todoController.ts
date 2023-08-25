@@ -6,7 +6,7 @@ export class TodoController {
     projects: Array<Project>;
     domDisplayer: DOMDisplayer = new DOMDisplayer();
 
-    constructor() { this.projects = [] }
+    constructor() { this.projects = []; }
 
     removeProject(projectToRemove: Project) { 
         this.projects.filter((project) => project !== projectToRemove);
@@ -30,10 +30,37 @@ export class TodoController {
     loadDefaultPage() {
         let today = new Project('Today');
         this.projects.push(today);
-        this.domDisplayer.displayLayout();
+        this.domDisplayer.displayLayout(() => { this.loadProject(today) }, () => { this.createProject(); });
         this.domDisplayer.displayProject(today);
         this.domDisplayer.addEventListenerToCreateTodo(() => {
             this.createTodo(today);
         });
+    }
+
+    loadTodos(project: Project) {
+        for (let todo of project.todos) {
+            this.domDisplayer.displayTodoBeforeCreateDiv(todo, () => { this.removeTodo(project, todo)});
+        }
+    }
+
+    createProject() {
+        let defaultProjectName = 'New Project';
+        let project = new Project(defaultProjectName);
+        this.projects.push(project);
+        this.domDisplayer.removeProjectContainer();
+        this.domDisplayer.displayProject(project);
+        this.domDisplayer.addEventListenerToCreateTodo(() => {
+            this.createTodo(project);
+        });
+        this.domDisplayer.displayProjectInSidePanel(project.title, () => { this.loadProject(project) });
+    }
+
+    loadProject(project: Project) {
+        this.domDisplayer.removeProjectContainer();
+            this.domDisplayer.displayProject(project);
+            this.domDisplayer.addEventListenerToCreateTodo(() => {
+                this.createTodo(project);
+            });
+            this.loadTodos(project);
     }
 }

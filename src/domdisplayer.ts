@@ -8,13 +8,12 @@ import { Project } from './project';
 
 export class DOMDisplayer {
     
-    displayLayout() {
+    displayLayout(loadTodaysTodos: () => void, createProject: () => void) {
         const mainContainer = document.createElement('div');
         mainContainer.setAttribute('id', 'main-container');
         document.body.appendChild(mainContainer);
         this.displayNavbar();
-        this.displaySidePanel();
-        this.displayProjectTitle('Today');
+        this.displaySidePanel(loadTodaysTodos, createProject);
     }
 
     displayProject(project: Project) {
@@ -44,10 +43,14 @@ export class DOMDisplayer {
         mainContainer.appendChild(navBarContainer);
     }
 
-    displaySidePanel() {
+    displaySidePanel(loadTodaysTodos: () => void, createProject: () => void) {
         const mainContainer = document.getElementById('main-container');
         const sidePanelContainer = document.createElement('div');
         sidePanelContainer.setAttribute('id', 'side-panel-container');
+
+        const todayElement = document.createElement('p');
+        todayElement.textContent = 'Today';
+        todayElement.addEventListener('click', loadTodaysTodos);
 
         const projectsContainerTitle = document.createElement('h2');
         projectsContainerTitle.textContent = 'Projects';
@@ -57,16 +60,44 @@ export class DOMDisplayer {
 
         const createProjectButton = document.createElement('button');
         createProjectButton.textContent = 'Create Project';
+        createProjectButton.addEventListener('click', createProject);
 
-        sidePanelContainer.append(projectsContainerTitle, projectsContainer, createProjectButton);
+        sidePanelContainer.append(todayElement, projectsContainerTitle, projectsContainer, createProjectButton);
         mainContainer.appendChild(sidePanelContainer);
     }
 
-    displayProjectTitle(title: string) {
+    displayProjectInSidePanel(title: string, loadProject: () => void) {
         const projectsContainer = document.getElementById('projects-container');
         const projectTitleElement = document.createElement('p');
+        projectTitleElement.addEventListener('click', () => {
+            loadProject();
+            this.unSelectProjectInSidePanel();
+            projectTitleElement.classList.add('selected-project');
+        });
         projectTitleElement.textContent = title;
         projectsContainer.appendChild(projectTitleElement);
+        this.unSelectProjectInSidePanel();
+        projectTitleElement.classList.add('selected-project');
+    }
+
+    selectProjectInSidePanel(targetProject: Project) {
+        const projectsContainer = document.getElementById('projects-container');
+        const projects = projectsContainer.querySelectorAll('p');
+        projects.forEach((project) => { 
+                if (project.textContent === targetProject.title) {
+                    project.classList.add('selected-project');
+                }
+            });
+    }
+
+    unSelectProjectInSidePanel() {
+        const projectsContainer = document.getElementById('projects-container');
+        const projects = projectsContainer.querySelectorAll('p');
+        projects.forEach((project) => { 
+                if (project.classList.contains('selected-project')) {
+                    project.classList.remove('selected-project');
+                }
+            });
     }
 
     displayTodo(elementAfter: Element, todo: TodoItem, removeTodo: () => void) {

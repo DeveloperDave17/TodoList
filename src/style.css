@@ -115,3 +115,7 @@ body {
     justify-content: center;
     align-items: center;
 }
+
+.selected-project {
+    color: green;
+}
