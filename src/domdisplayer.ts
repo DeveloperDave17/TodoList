@@ -3,6 +3,8 @@ import magnifyingGlassImage from './icons/search-solid.svg';
 import dropDownImage from './icons/chevron-circle-down-solid.svg';
 import trashCanImage from './icons/trash-can-outline.svg';
 import './style.css';
+import { TodoItem } from './todoItem';
+import { Project } from './project';
 
 export class DOMDisplayer {
     
@@ -13,7 +15,10 @@ export class DOMDisplayer {
         this.displayNavbar();
         this.displaySidePanel();
         this.displayProjectTitle('Today');
-        this.displayProjectContainer('Today');
+    }
+
+    displayProject(project: Project) {
+        this.displayProjectContainer(project.title);
         this.displayCreateTodo();
     }
 
@@ -64,41 +69,33 @@ export class DOMDisplayer {
         projectsContainer.appendChild(projectTitleElement);
     }
 
-    displayTodo(elementAfter: Element, title: string, dueDate: string, priority: string) {
+    displayTodo(elementAfter: Element, todo: TodoItem, removeTodo: () => void) {
         const todoContainer = document.createElement('div');
         todoContainer.classList.add('todo-container');
         todoContainer.classList.add('collapsed');
 
         const titleElement = document.createElement('h2');
-        titleElement.textContent = title;
+        titleElement.textContent = todo.title;
 
         const dueDateElement = document.createElement('p');
-        dueDateElement.textContent = dueDate;
+        dueDateElement.textContent = todo.dueDate;
 
         const dropDownElement = new Image();
         dropDownElement.src = dropDownImage;
 
         todoContainer.append(titleElement, dueDateElement, dropDownElement);
-        this.displayPriority(todoContainer, priority);
+        this.displayPriority(todoContainer, todo.priority);
 
         const projectTodoContainer = document.getElementById('project-todos-container');
         projectTodoContainer.insertBefore(todoContainer, elementAfter);
+        todoContainer.addEventListener('click', () => {
+            this.displayExpandedTodo(todo, todoContainer, removeTodo);
+        })
     }
 
-    displayTodoAtIndex(todoIndex: number, title: string, dueDate: string, priority: string) {
-        const projectTodos = document.querySelectorAll('.todo-container');
-        const todoElement = projectTodos[todoIndex];
-        if (todoElement === null) {
-            const createElement = document.getElementById('create-todo-container');
-            this.displayTodo(createElement, title, dueDate, priority);
-        } else {
-            this.displayTodo(todoElement, title, dueDate, priority);
-        }
-    }
-
-    displayTodoBeforeCreateDiv(title: string, dueDate: string, priority: string) {
+    displayTodoBeforeCreateDiv(todo: TodoItem, removeTodo: () => void) {
         const createElement = document.getElementById('create-todo-container');
-        this.displayTodo(createElement, title, dueDate, priority);
+        this.displayTodo(createElement, todo, removeTodo);
     }
 
     removeTodoElement(todoElement: Element) {
@@ -113,10 +110,8 @@ export class DOMDisplayer {
         }
     }
 
-    addEventListenerToTodo(index: number, expandTodo: () => void) {
-        const projectTodos = document.querySelectorAll('.todo-container');
-        const todoContainer = projectTodos[index];
-        todoContainer.addEventListener('click', expandTodo);
+    addEventListenerToTodo(todoElement: Element, expandTodo: () => void) {
+        todoElement.addEventListener('click', expandTodo);
     }
 
     displayPriority(todoContainer: HTMLDivElement, priority: string) {
@@ -165,7 +160,7 @@ export class DOMDisplayer {
         projectTodoContainer.appendChild(createTodoContainer);
     }
 
-    displayExpandedTodo(todoIndex: number, title: string, description: string, notes: string, priority: string, dueDate: string) {
+    displayExpandedTodo(todo: TodoItem, todoElement: HTMLDivElement, removeTodo: () => void) {
         const todoContainer = document.createElement('div');
         todoContainer.classList.add('todo-container');
         todoContainer.classList.add('expanded');
@@ -174,19 +169,19 @@ export class DOMDisplayer {
         trashCanElement.src = trashCanImage;
 
         const titleElement = document.createElement('h2');
-        titleElement.textContent = title;
+        titleElement.textContent = todo.title;
         titleElement.setAttribute('contenteditable', 'true');
 
         const descriptionElement = document.createElement('input');
         descriptionElement.type = 'text';
-        descriptionElement.value = description;
+        descriptionElement.value = todo.description;
 
         const notesHeader = document.createElement('h3');
         notesHeader.textContent = 'Notes';
 
         const notesElement = document.createElement('input');
         notesElement.type = 'text';
-        notesElement.value = notes;
+        notesElement.value = todo.notes;
 
         const priorityContainer = document.createElement('div');
 
@@ -200,85 +195,70 @@ export class DOMDisplayer {
         const lowPriorityOption = document.createElement('option');
         lowPriorityOption.setAttribute('value', 'low');
         lowPriorityOption.textContent = 'low';
-        if (priority === 'low') { lowPriorityOption.selected = true; }
+        if (todo.priority === 'low') { lowPriorityOption.selected = true; }
 
         const medPriorityOption = document.createElement('option');
         medPriorityOption.setAttribute('value', 'medium');
         medPriorityOption.textContent = 'medium';
-        if (priority === 'medium') { medPriorityOption.selected = true; }
+        if (todo.priority === 'medium') { medPriorityOption.selected = true; }
 
         const highPriorityOption = document.createElement('option');
         highPriorityOption.setAttribute('value', 'high');
         highPriorityOption.textContent = 'high';
-        if (priority === 'high') { highPriorityOption.selected = true; }
+        if (todo.priority === 'high') { highPriorityOption.selected = true; }
 
         const noPriorityOption = document.createElement('option');
         noPriorityOption.setAttribute('value', 'none');
         noPriorityOption.textContent = 'none';
-        if (priority === 'none') { noPriorityOption.selected = true; }
+        if (todo.priority === 'none') { noPriorityOption.selected = true; }
 
         prioritySelection.append(noPriorityOption, lowPriorityOption, medPriorityOption, highPriorityOption);
         priorityContainer.append(priorityLabel, prioritySelection);
 
         const dueDateElement = document.createElement('input');
         dueDateElement.type = 'date';
-        dueDateElement.value = dueDate;
+        dueDateElement.value = todo.dueDate;
 
         const dropDownElement = new Image();
         dropDownElement.src = dropDownImage;
 
         todoContainer.append(trashCanElement, titleElement, descriptionElement, notesHeader, notesElement, dueDateElement, priorityContainer, dropDownElement);
-        this.displayPriority(todoContainer, priority);
+        this.displayPriority(todoContainer, todo.priority);
 
         const projectTodoContainer = document.getElementById('project-todos-container');
-        const projectTodos = document.querySelectorAll('.todo-container');
-        projectTodoContainer.insertBefore(todoContainer, projectTodos[todoIndex]);
-        projectTodoContainer.removeChild(projectTodos[todoIndex]);
+        projectTodoContainer.insertBefore(todoContainer, todoElement);
+        projectTodoContainer.removeChild(todoElement);
+        this.addEventListenersToExpandedTodo(todo, todoContainer, removeTodo);
     }
 
-    addEventListenersToExpandedTodo(todoIndex: number, updateStoredTitle: (title: string) => void, updateStoredDesc: (description: string) => void, updateStoredNotes: (notes: string) => void, updateStoredPriority: (priority: string) => void, updateStoredDueDate: (dueDate: string) => void, removeTodo: () => void, collapseTodo: () => void) {
-        const projectTodos = document.querySelectorAll('.todo-container');
-        const todoContainer = projectTodos[todoIndex];
-
+    addEventListenersToExpandedTodo(todo: TodoItem, todoContainer: Element, removeTodo: () => void) {
         const titleElement = todoContainer.querySelector('h2');
-        titleElement.addEventListener('input', () => { updateStoredTitle(titleElement.textContent) });
+        titleElement.addEventListener('input', () => { todo.title = titleElement.textContent });
 
         const inputElements = todoContainer.querySelectorAll('input');
         const descriptionElement = inputElements[0];
-        descriptionElement.addEventListener('input', () => { updateStoredDesc(descriptionElement.value) });
+        descriptionElement.addEventListener('input', () => { todo.description = descriptionElement.value });
 
         const notesElement = inputElements[1];
-        notesElement.addEventListener('input', () => { updateStoredNotes(notesElement.value) });
+        notesElement.addEventListener('input', () => { todo.notes = notesElement.value });
 
         const dueDateElement = inputElements[2];
-        dueDateElement.addEventListener('input', () => { updateStoredDueDate(dueDateElement.value) });
+        dueDateElement.addEventListener('input', () => { todo.dueDate = dueDateElement.value });
 
         const priorityElement = todoContainer.querySelector('select');
-        priorityElement.addEventListener('change', () => { updateStoredPriority(priorityElement.value) });
+        priorityElement.addEventListener('change', () => { todo.priority = priorityElement.value });
 
         const images = todoContainer.querySelectorAll('img');
 
         const removeElement = images[0];
         removeElement.addEventListener('click', removeTodo);
+        removeElement.addEventListener('click', () => this.removeTodoElement(todoContainer));
 
         const collapseElement = images[1];
-        collapseElement.addEventListener('click', collapseTodo);
-    }
-
-    cloneTodo(todoIndex: number) {
-        const projectTodoContainer = document.getElementById('project-todos-container');
-        const todos = document.querySelectorAll('.todo-container');
-        const replacementTodo = todos[todoIndex].cloneNode(true);
-        projectTodoContainer.replaceChild(replacementTodo, todos[todoIndex]);
-    }
-
-    addEventListenersToClonedTodo(todoIndex: number, expandTodo: () => void, updateStoredTitle: (title: string) => void, updateStoredDesc: (description: string) => void, updateStoredNotes: (notes: string) => void, updateStoredPriority: (priority: string) => void, updateStoredDueDate: (dueDate: string) => void, removeTodo: () => void, collapseTodo: () => void) {
-        const todos = document.querySelectorAll('.todo-container');
-        if (todos[todoIndex].classList.contains('collapsed')) {
-            this.addEventListenerToTodo(todoIndex, expandTodo);
-        } else {
-            this.addEventListenersToExpandedTodo(todoIndex, updateStoredTitle, updateStoredDesc, updateStoredNotes, updateStoredPriority, updateStoredDueDate, removeTodo, collapseTodo);
-        }
+        collapseElement.addEventListener('click', () => { 
+            this.displayTodo(todoContainer, todo, removeTodo);
+            this.removeTodoElement(todoContainer);
+        });
     }
 
     addEventListenerToCreateTodo(createTodo: () => void) {
