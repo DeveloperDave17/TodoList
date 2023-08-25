@@ -17,7 +17,12 @@ export class DOMDisplayer {
     }
 
     displayProject(project: Project) {
-        this.displayProjectContainer(project.title);
+        this.displayProjectContainer(project);
+        this.displayCreateTodo();
+    }
+
+    displayProjectWithEditableName(project: Project) {
+        this.displayProjectContainerWithEditableName(project);
         this.displayCreateTodo();
     }
 
@@ -100,6 +105,11 @@ export class DOMDisplayer {
             });
     }
 
+    changeNameOfSelectedProject(projectTitle: string) {
+        const selectedProject = document.querySelector('.selected-project');
+        selectedProject.textContent = projectTitle;
+    }
+
     displayTodo(elementAfter: Element, todo: TodoItem, removeTodo: () => void) {
         const todoContainer = document.createElement('div');
         todoContainer.classList.add('todo-container');
@@ -157,20 +167,35 @@ export class DOMDisplayer {
         todoContainer.style.backgroundColor = backgroundcolor;
     }
 
-    displayProjectContainer(projectTitle: string) {
+    displayProjectContainer(project: Project) {
         const mainContainer = document.getElementById('main-container');
 
         const projectContainer = document.createElement('div');
         projectContainer.setAttribute('id', 'project-container');
 
         const projectTitleElement = document.createElement('h1');
-        projectTitleElement.textContent = projectTitle;
+        projectTitleElement.textContent = project.title;
 
         const projectTodosContainer = document.createElement('div');
         projectTodosContainer.setAttribute('id', 'project-todos-container');
 
         projectContainer.append(projectTitleElement, projectTodosContainer);
         mainContainer.append(projectContainer);
+    }
+
+    displayProjectContainerWithEditableName(project: Project) {
+        this.displayProjectContainer(project);
+        const projectTitleElement = document.querySelector('#project-container>h1');
+        projectTitleElement.setAttribute('contenteditable', 'true');
+        projectTitleElement.addEventListener('input', () => {
+            let inputtedName = projectTitleElement.textContent;
+            if (inputtedName === '') {
+                project.title = 'RENAME';
+            } else {
+                project.title = projectTitleElement.textContent;
+            }
+            this.changeNameOfSelectedProject(project.title);
+            });
     }
 
     removeProjectContainer() {

@@ -48,7 +48,7 @@ export class TodoController {
         let project = new Project(defaultProjectName);
         this.projects.push(project);
         this.domDisplayer.removeProjectContainer();
-        this.domDisplayer.displayProject(project);
+        this.domDisplayer.displayProjectWithEditableName(project);
         this.domDisplayer.addEventListenerToCreateTodo(() => {
             this.createTodo(project);
         });
@@ -57,7 +57,7 @@ export class TodoController {
 
     loadProject(project: Project) {
         this.domDisplayer.removeProjectContainer();
-            this.domDisplayer.displayProject(project);
+            this.domDisplayer.displayProjectWithEditableName(project);
             this.domDisplayer.addEventListenerToCreateTodo(() => {
                 this.createTodo(project);
             });
