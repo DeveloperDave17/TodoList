@@ -55,7 +55,10 @@ export class DOMDisplayer {
 
         const todayElement = document.createElement('p');
         todayElement.textContent = 'Today';
-        todayElement.addEventListener('click', loadTodaysTodos);
+        todayElement.addEventListener('click', () => {
+            loadTodaysTodos();
+            this.unSelectProjectInSidePanel();
+        });
 
         const projectsContainerTitle = document.createElement('h2');
         projectsContainerTitle.textContent = 'Projects';
@@ -225,7 +228,7 @@ export class DOMDisplayer {
                 project.title = projectTitleElement.textContent;
             }
             this.changeNameOfSelectedProject(project.title);
-            });
+        });
     }
 
     removeProjectContainer() {

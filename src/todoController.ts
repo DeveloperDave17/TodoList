@@ -12,10 +12,6 @@ export class TodoController {
         this.projects = this.projects.filter((project) => project !== projectToRemove);
     }
 
-    // removeTodo(project: Project, todoToRemove: TodoItem) {
-    //     project.todos.filter((todo) => todo !== todoToRemove);
-    // }
-
     createTodo(project: Project) {
         let defaultTodoTitle: string = "Title";
         let defaultTodoDescription: string = "description";
